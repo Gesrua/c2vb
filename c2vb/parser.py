@@ -3,25 +3,10 @@ from .ast import ASTnode
 DATATYPE = keywords[0]
 
 
-class IDT(object):
-    def __init__(self):
-        self.identifiers = {}
-
-    def add(self, identifier, type):
-        self.identifiers[identifier] = type
-
-    def ask(self, identifier):
-        return self.identifiers[identifier]
-
-    def __str__(self):
-        return str(self.identifiers)
-
-
 class Parser(object):
     def __init__(self, tokens):
         self.tokens = tokens
         self.length = len(self.tokens)
-        self.id = IDT()
         self.analyze()
 
     def forward(self, s, index):
@@ -302,9 +287,6 @@ class Parser(object):
             if self.match(',', index):
                 index = index + 1
 
-        for i in node.childs:
-            identifier = i.childs[0]
-            self.id.add(identifier.value, i.type)
         index = self.forward('SEMICOLON', index)
         return node, index
 
@@ -420,7 +402,6 @@ class Parser(object):
         index = index + 1
         identifier, index = self._identifier(index)
         node.add_child(identifier)
-        self.id.add(identifier.value, node.value)
         index = self.forward('(', index)
         args = ASTnode('ARGSDECLARE', 'args_declare', [])
         while self.match(DATATYPE, index):
