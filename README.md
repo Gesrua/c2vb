@@ -4,8 +4,26 @@ A program convert simple C / C++ code to Visual Basic 6 code
 
 ### 特性
 
+将 C / C++ 转成 AST 再转成 VB
+
 - 实现基本语法
 - 简单类型推断（区分 `/` 和 `\`）
+- 可打印带缩进 AST
+- 可生成 Graphviz dot 语言 AST
+
+```python
+import c2vb
+
+f = open('sample.c', 'r')
+src = f.read()
+lex = c2vb.Lexer(src) # 词法
+parser = c2vb.Parser(lex.tokens) # 语法
+c2vb.proc(parser.ast) # 类型推断
+
+parser.ast.vb() == c2vb.run(file='sample.c')  == c2vb.run(src='sample.c') # 返回 VB 代码
+parser.ast.dot() # 返回以 dot 语言表示的 AST
+str(parser.ast) # 返回字符串带缩进 AST
+```
 
 ### 注意
 
