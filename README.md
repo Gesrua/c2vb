@@ -28,6 +28,7 @@ str(parser.ast) # 返回字符串带缩进 AST
 ### 注意
 
 - 不支持预处理命令(`#include` `#define` ...)
+  - 可以试试 `g++ -E file.cpp` 来处理 `#define`
 - `++`  `--` 是被看作赋值的，不能在表达式中出现。
 - 不支持 `struct` `class`
 - 不支持数组初始化
@@ -39,10 +40,17 @@ str(parser.ast) # 返回字符串带缩进 AST
 - 不支持 `do ... while()`
 - 语句只有 if/for/while/return/break/const/变量定义/函数调用
   - 也就是说 表达式 加 `;` 当语句是不行的
+- 类型只有 `int/float/double/bool/string`
 
 ### 贡献
 
 欢迎提 bug, issue, pull request
+
+TODO:
+
+- 连赋值 `a=b=c`
+- 特殊 `for` 翻译成 `For` （遥遥无期）
+- C / C++ 中常用函数写入语法之中方便运行
 
 ### 支持的语法
 
