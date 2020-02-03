@@ -13,6 +13,14 @@ Warning: only support very little C / C++ grammar
 - 可打印带缩进 AST
 - 可生成 Graphviz dot 语言 AST
 
+### 使用方法
+
+```bash
+$ pip install c2vb
+$ c2vb sample.c
+$ c2vb sample.cpp
+```
+
 ```python
 import c2vb
 
