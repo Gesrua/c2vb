@@ -1,6 +1,6 @@
 # c2vb
 
-A program convert simple C / C++ code to Visual Basic 6 code
+A Python program convert simple C / C++ code to Visual Basic 6 code
 
 Warning: only support very little C / C++ grammar
 
