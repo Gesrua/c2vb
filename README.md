@@ -2,6 +2,8 @@
 
 A program convert simple C / C++ code to Visual Basic 6 code
 
+Warning: only support very little C / C++ grammar
+
 ### 特性
 
 将 C / C++ 转成 AST 再转成 VB
@@ -49,6 +51,8 @@ str(parser.ast) # 返回字符串带缩进 AST
 
 TODO:
 
+- 表达式中含有 `++` `--`
+  - 这件事比较麻烦因为这会把一个赋值变成两三个
 - 连赋值 `a=b=c`
 - 特殊 `for` 翻译成 `For` （遥遥无期）
 - C / C++ 中常用函数写入语法之中方便运行
