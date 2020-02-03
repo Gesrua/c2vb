@@ -4,7 +4,7 @@ TRANS = {
     'INT': 'Long', 'FLOAT': 'Single', 'DOUBLE': 'Double', 'STRING': 'string', 'BOOL': 'Boolean',
     'LOGIC_AND': 'And', 'LOGIC_OR': 'Or', 'LOGIC_Not': 'Not',
     'ARITHMETIC_AND': 'And', 'ARITHMETIC_OR': 'Or', 'ARITHMETIC_NOT': 'Not', 'XOR': 'Xor',
-    'PLUS': '+', 'MINUS': '-', 'NEG': '-', 'MUL': '*', 'MOD': 'Mod',
+    'PLUS': '+', 'MINUS': '-', 'NEG': '-', 'MUL': '*', 'MOD': 'Mod', 'DIV': '/', 'INTDIV': '\\',
     'GET': '>=', 'LET': '<=', 'LT': '<', 'GT': '>', 'EQUAL': '=', 'NOT_EQUAL': '<>',
 }
 
@@ -40,92 +40,91 @@ class ASTnode(object):
             count = count + 1
         return ret
 
-    def vb(self, r=0, shift='    ', idt=None):
+    def vb(self, r=0, shift='    '):
         if self.type == 'IDENTIFIER':
             ret = self.value
             for i in self.childs[0].childs:
-                ret = ret + '(%s)' % i.vb(idt=idt)
+                ret = ret + '(%s)' % i.vb()
             return ret
         elif self.type == 'DECLARE':
             ret = ''
             for i in self.childs:
                 if len(i.childs) == 1:
                     ret = ret + \
-                        '%s As %s, ' % (i.childs[0].vb(idt=idt), TRANS[i.type])
+                        '%s As %s, ' % (i.childs[0].vb(), TRANS[i.type])
                 else:
                     ret = ret + \
-                        '%s As %s = %s, ' % (i.childs[0].vb(
-                            idt=idt), TRANS[i.type], i.childs[1].vb(idt=idt))
+                        '%s As %s = %s, ' % (
+                            i.childs[0].vb(), TRANS[i.type], i.childs[1].vb())
             return shift*r + 'Dim ' + ret[0:-2] + '\n'
         elif self.type == 'ARGSDECLARE':
             ret = ''
             for arg in self.childs:
-                identifier = arg.childs[0].vb(idt=idt)
+                identifier = arg.childs[0].vb()
                 ret = ret + '%s As %s, ' % (identifier, TRANS[arg.type])
             return ret[:-2]
         elif self.type == 'FUNCDECLARE':
-            identifier = self.childs[0].vb(idt=idt)
-            parameters = self.childs[1].vb(idt=idt)
-            statements = self.childs[2].vb(idt=idt, r=r+1)
+            identifier = self.childs[0].vb()
+            parameters = self.childs[1].vb()
+            statements = self.childs[2].vb(r=r+1)
             if self.value == 'VOID':
                 return 'Sub %s(%s)\n%sEnd Sub\n' % (identifier, parameters, statements)
             else:
                 return 'Function %s(%s) As %s\n%sEnd Function\n' % (identifier, parameters, TRANS[self.value], statements)
         elif self.type == 'STATEMENT':
-            return shift*r + self.childs[0].vb(idt=idt) + '\n'
+            return shift*r + self.childs[0].vb() + '\n'
         elif self.type == 'STATEMENTS':
             ret = ''
             for i in self.childs:
-                ret = ret + i.vb(idt=idt, r=r)
+                ret = ret + i.vb(r=r)
             return ret
         elif self.type == 'ASSIGN':
-            return self.childs[0].vb(idt=idt) + ' = ' + self.childs[1].vb(idt=idt)
+            return self.childs[0].vb() + ' = ' + self.childs[1].vb()
         elif self.type == 'ASSIGNS':
             ret = ''
             for assign in self.childs:
-                ret = ret + assign.vb(idt=idt) + ': '
+                ret = ret + assign.vb() + ': '
             return ret[:-2]
         elif self.type == 'IF':
             ret = shift*r + \
-                'If %s Then\n' % self.childs[0].vb(
-                    idt=idt) + self.childs[1].vb(idt=idt, r=r+1)
+                'If %s Then\n' % self.childs[0].vb() + self.childs[1].vb(r=r+1)
             if (len(self.childs) == 3):
                 ret = ret + shift*r + 'Else\n' + \
-                    self.childs[2].vb(idt=idt, r=r+1)
+                    self.childs[2].vb(r=r+1)
             ret = ret + shift*r + 'End If\n'
             return ret
         elif self.type == 'WHILE':
             print(self)
-            return shift*r + 'Do While ' + self.childs[0].vb(idt=idt) + '\n' + \
-                self.childs[1].vb(idt=idt, r=r+1) + \
+            return shift*r + 'Do While ' + self.childs[0].vb() + '\n' + \
+                self.childs[1].vb(r=r+1) + \
                 shift*r + 'Loop\n'
         elif self.type == 'FOR':
             self.type, self.value = 'WHILE', 'while'
-            return shift*r + self.childs[0].vb(idt=idt) + ['', '\n'][self.childs[0].type == 'ASSIGNS'] + \
-                shift*r + 'Do While ' + self.childs[1].vb(idt=idt) + '\n' + \
-                self.childs[3].vb(idt=idt, r=r+1) + \
-                shift*(r+1) + self.childs[2].vb(idt=idt) + '\n' + \
+            return shift*r + self.childs[0].vb() + ['', '\n'][self.childs[0].type == 'ASSIGNS'] + \
+                shift*r + 'Do While ' + self.childs[1].vb() + '\n' + \
+                self.childs[3].vb(r=r+1) + \
+                shift*(r+1) + self.childs[2].vb() + '\n' + \
                 shift*r + 'Loop\n'
         elif self.type == 'FUNCTIONCALL':
-            identifier = self.childs[0].vb(idt=idt)
-            if idt.ask(identifier) == 'VOID':
+            identifier = self.childs[0].vb()
+            if self.idt.ask(identifier) == 'VOID':
                 ret = shift*r + identifier + ' ' + \
-                    self.childs[1].vb(idt=idt) + '\n'
+                    self.childs[1].vb() + '\n'
                 return ret
             else:
-                ret = identifier + '(' + self.childs[1].vb(idt=idt) + ')'
+                ret = identifier + '(' + self.childs[1].vb() + ')'
                 return ret
         elif self.type == 'ARGS':
             ret = ''
             for i in self.childs:
-                ret = ret + i.vb(idt=idt) + ', '
+                ret = ret + i.vb() + ', '
             return ret[0:-2]
         elif self.type == 'CONST':
             ret = ''
             for i in self.childs:
                 ret = ret + \
-                    '%s As %s = %s, ' % (i.childs[0].vb(
-                        idt=idt), TRANS[i.type], i.childs[1].vb(idt=idt))
+                    '%s As %s = %s, ' % (
+                        i.childs[0].vb(), TRANS[i.type], i.childs[1].vb())
             return 'Const ' + ret[0:-2] + '\n'
         elif self.type == 'DIGIT_CONSTANT':
             return str(self.value)
@@ -134,7 +133,7 @@ class ASTnode(object):
         elif self.type == 'ROOT':
             ret = ''
             for i in self.childs:
-                ret = ret + i.vb(idt=idt)
+                ret = ret + i.vb()
             return ret
         elif self.type == 'BREAK':
             loop = ''
@@ -153,13 +152,13 @@ class ASTnode(object):
                     if p.value == 'VOID':
                         return shift*r + 'Exit Sub\n'
                     else:
-                        identifier = p.childs[0].vb(idt=idt)
-                        expr = self.childs[0].vb(idt=idt)
+                        identifier = p.childs[0].vb()
+                        expr = self.childs[0].vb()
                         return shift*r + identifier + ' = ' + expr + '\n' + \
                             shift*r + 'Exit Function\n'
                 p = p.parent
         elif self.value in operators:
             if self.type in ['LOGIC_NOT', 'NEG', 'ARITHMETIC_NOT']:
-                return TRANS[self.type]+self.childs[0].vb(idt=idt)
+                return TRANS[self.type]+self.childs[0].vb()
             else:
-                return self.childs[0].vb(idt=idt)+' '+TRANS[self.type]+' ' + self.childs[1].vb(idt=idt)
+                return self.childs[0].vb()+' '+TRANS[self.type]+' ' + self.childs[1].vb()

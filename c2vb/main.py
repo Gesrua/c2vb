@@ -1,5 +1,6 @@
 from .lexer import Lexer
 from .parser import Parser
+from .idt import proc
 
 def run(file=None, src=None):
     if file == None and src == None:
@@ -10,6 +11,7 @@ def run(file=None, src=None):
     src = f.read()
     lex = Lexer(src)
     parser = Parser(lex.tokens)
-    return parser.ast.vb(idt=parser.id)
+    proc(parser.ast)
+    return parser.ast.vb()
 
 
