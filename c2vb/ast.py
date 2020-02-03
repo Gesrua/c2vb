@@ -161,4 +161,4 @@ class ASTnode(object):
             if self.type in ['LOGIC_NOT', 'NEG', 'ARITHMETIC_NOT']:
                 return TRANS[self.type]+self.childs[0].vb()
             else:
-                return self.childs[0].vb()+' '+TRANS[self.type]+' ' + self.childs[1].vb()
+                return '('+self.childs[0].vb()+' '+TRANS[self.type]+' '+self.childs[1].vb()+')'
