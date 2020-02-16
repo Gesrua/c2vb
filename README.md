@@ -30,7 +30,7 @@ lex = c2vb.Lexer(src) # 词法
 parser = c2vb.Parser(lex.tokens) # 语法
 c2vb.proc(parser.ast) # 类型推断
 
-parser.ast.vb() == c2vb.run(file='sample.c') == c2vb.run(src='sample.c') # 返回 VB 代码
+parser.ast.vb() == c2vb.run(file='sample.c') == c2vb.run(src=src) # 返回 VB 代码
 parser.ast.dot() # 返回以 dot 语言表示的 AST
 str(parser.ast) # 返回字符串带缩进 AST
 ```
