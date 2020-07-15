@@ -36,6 +36,9 @@ def proc(node):
         node.datatype = {float: 'DOUBLE', bool: 'BOOL', int: 'INT', str: 'STRING'}[type(node.value)]
     elif node.type == 'IDENTIFIER':
         node.datatype = node.idt.ask(node.value)
+    elif node.type == 'FUNCTIONCALL':
+        node.datatype = node.idt.ask(node.childs[0].value)
+
     for i in node.childs:
         if i.type in ['IF', 'FOR', 'WHILE', 'FUNCDECLARE']:
             if i.type == 'FUNCDECLARE':
