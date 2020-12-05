@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 setuptools.setup(
     name='c2vb',
     packages=['c2vb'],
-    version='0.0.1',
+    version='0.0.4',
     license='MIT',
     description='A program convert simple C / C++ code to Visual Basic 6 code',
     long_description=long_description,
